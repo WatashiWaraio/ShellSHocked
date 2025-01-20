@@ -1,15 +1,34 @@
-
 const terminal = document.getElementById('terminal');
 const commandInput = document.getElementById('commandInput');
 
 let currentDir = '/home/user';
 const fileSystem = {
-    '/home/user': {
-        'documents': {},
-        'downloads': {},
-        'pictures': {},
-        'README.txt': 'Welcome to your home directory!'
+    home: {
+        user: {}
     }
+};
+
+let challengeMode = false; 
+let currentCommand = ''; 
+let completedChallenges = 0; 
+const totalChallenges = 5;
+
+const commandDescriptions = {
+    pwd: '📌 This command prints the current working directory.',
+    ls: '📂 List the contents of the current directory.',
+    cd: '📁 Change the current directory to another one.',
+    mkdir: '🛠️ Create a new directory.',
+    touch: '📄 Create an empty file.',
+    rm: '🗑️ Remove a file or directory.',
+    mv: '🚚 Move or rename a file or directory.',
+    head: '🔍 Display the first few lines of a file.',
+    tail: '🔍 Display the last few lines of a file.',
+    less: '📖 View a file one page at a time.',
+    clear: '🧹 Clear the terminal screen.',
+    tree: '🌳 Display the directory structure in a tree format.',
+    file: '📋 Determine the type of a file.',
+    cp: '📤 Copy files or directories.',
+    nautilus: '🌐 Open the file explorer GUI.'
 };
 
 function getCurrentDirObj() {
@@ -29,78 +48,26 @@ function setCommand(cmd) {
     commandInput.focus();
 }
 
-const commands = {
-    help: () => {
-        appendToTerminal('\nAvailable commands:');
-        appendToTerminal('  pwd - Print Working Directory');
-        appendToTerminal('  ls - List Directory Contents');
-        appendToTerminal('  cd <dir> - Change Directory');
-        appendToTerminal('  mkdir <name> - Create Directory');
-        appendToTerminal('  touch <name> - Create File');
-        appendToTerminal('  clear - Clear Terminal');
-        appendToTerminal('  help - Show This Help\n');
-    },
-    pwd: () => {
-        appendToTerminal(currentDir);
-    },
-    ls: () => {
-        const currentDirContents = getCurrentDirObj();
-        const contents = Object.keys(currentDirContents).join('  ');
-        appendToTerminal(contents || '(empty directory)');
-    },
-    cd: (args) => {
-        if (!args[0] || args[0] === '~') {
-            currentDir = '/home/user';
-            return;
-        }
-        
-        const newPath = args[0].startsWith('/')
-            ? args[0]
-            : `${currentDir}/${args[0]}`;
+function startChallenge() {
+    const commandsList = Object.keys(commandDescriptions);
+    currentCommand = commandsList[Math.floor(Math.random() * commandsList.length)];
+    appendToTerminal(`🤔 Hint: ${commandDescriptions[currentCommand]}`);
+}
 
-        try {
-            const dirObj = newPath.split('/').reduce((acc, curr) => {
-                if (!curr) return acc;
-                if (!acc[curr] || typeof acc[curr] !== 'object') {
-                    throw new Error();
-                }
-                return acc[curr];
-            }, fileSystem);
-            
-            currentDir = newPath;
-        } catch {
-            appendToTerminal(`cd: no such directory: ${args[0]}`, 'error');
-        }
+const commands = {
+    rules: () => {
+        appendToTerminal('\n🎉 Welcome to the ShellShockEd Game! 🎉');
+        appendToTerminal('✨ This game will inspire you to learn shell commands in a fun way!');
+        appendToTerminal('🖋️ Type "start" to begin the challenge.');
+        appendToTerminal('🧩 Solve the enigma by entering the correct shell command.');
+        appendToTerminal('✅ Complete all challenges to win!');
+        appendToTerminal('❌ Make a mistake? Don\'t worry, you can try again.\n');
     },
-    mkdir: (args) => {
-        if (!args[0]) {
-            appendToTerminal('mkdir: missing operand', 'error');
-            return;
-        }
-        
-        const currentDirObj = getCurrentDirObj();
-        if (currentDirObj[args[0]]) {
-            appendToTerminal(`mkdir: cannot create directory '${args[0]}': File exists`, 'error');
-            return;
-        }
-        
-        currentDirObj[args[0]] = {};
-        appendToTerminal(`Created directory: ${args[0]}`, 'success');
-    },
-    touch: (args) => {
-        if (!args[0]) {
-            appendToTerminal('touch: missing operand', 'error');
-            return;
-        }
-        
-        const currentDirObj = getCurrentDirObj();
-        if (currentDirObj[args[0]]) {
-            appendToTerminal(`touch: file '${args[0]}' already exists`, 'error');
-            return;
-        }
-        
-        currentDirObj[args[0]] = '';
-        appendToTerminal(`Created file: ${args[0]}`, 'success');
+    start: () => {
+        appendToTerminal('🚀 Starting the challenge mode...');
+        challengeMode = true;
+        completedChallenges = 0;
+        startChallenge();
     },
     clear: () => {
         terminal.innerHTML = '';
@@ -111,19 +78,31 @@ commandInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const commandLine = commandInput.value.trim();
         const [command, ...args] = commandLine.split(' ');
-        
+
         appendToTerminal(`$ ${commandLine}`);
-        
-        if (commands[command]) {
+
+        if (challengeMode) {
+            if (command === currentCommand) {
+                appendToTerminal('✅ Correct! Moving to the next challenge.', 'success');
+                completedChallenges++;
+                if (completedChallenges < totalChallenges) {
+                    startChallenge();
+                } else {
+                    appendToTerminal('🎉 Congratulations! You have completed all challenges! 🎉', 'success');
+                    challengeMode = false;
+                }
+            } else {
+                appendToTerminal('❌ Incorrect! Try again.', 'error');
+            }
+        } else if (commands[command]) {
             commands[command](args);
         } else if (command) {
             appendToTerminal(`Command not found: ${command}`, 'error');
         }
-        
+
         commandInput.value = '';
         terminal.scrollTop = terminal.scrollHeight;
     }
 });
 
-// Initial help message
-commands.help();
+commands.rules();

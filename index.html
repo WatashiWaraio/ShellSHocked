@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bash Terminal Playground</title>
+   
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -10,38 +13,38 @@
     </header>
     <div class="container">
         <div class="tutorial">
-            <h2>Basic Commands</h2>
-            <div class="tutorial-item" onclick="setCommand('pwd')">
-                <strong>pwd</strong> - Print Working Directory
+            <h2>Commands</h2>
+            <div class="tutorial-item">
+                <strong>pwd</strong> - Print
                 <div class="hint">Shows current location in the filesystem</div>
             </div>
-            <div class="tutorial-item" onclick="setCommand('ls')">
+            <div class="tutorial-item" >
                 <strong>ls</strong> - List Directory Contents
                 <div class="hint">Shows files and folders in current directory</div>
             </div>
-            <div class="tutorial-item" onclick="setCommand('cd documents')">
+            <div class="tutorial-item" >
                 <strong>cd</strong> - Change Directory
                 <div class="hint">Navigate between folders</div>
             </div>
-            <div class="tutorial-item" onclick="setCommand('mkdir new_folder')">
+            <div class="tutorial-item">
                 <strong>mkdir</strong> - Make Directory
                 <div class="hint">Create a new folder</div>
             </div>
-            <div class="tutorial-item" onclick="setCommand('touch file.txt')">
+            <div class="tutorial-item" >
                 <strong>touch</strong> - Create File
                 <div class="hint">Create a new empty file</div>
             </div>
         </div>
         <div class="terminal-container">
             <div id="terminal">Welcome to Bash Terminal Playground!
-Type 'help' to see available commands.</div>
+                Type 'help' to see available commands.</div>
             <div class="input-line">
                 <span class="prompt">$</span>
                 <input type="text" id="commandInput" autofocus>
             </div>
         </div>
     </div>
-
-   
+    
+    <script src="app.js"></script>
 </body>
 </html>
